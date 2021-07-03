@@ -9,33 +9,43 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 /**
  *
  * @author joann
  */
 public class Main{
-
+        static int Sum = 0;
+        static long procTime;
+        
         public static void main(String args[]){ 
+        
+        //create an array of 20M random numbe3rs
         int arrayLength=200000000;
         int myRandom = 0;
+        //initialize the array
         int RandNumbers[]=new int[arrayLength];
          for (int i=0;i<RandNumbers.length;i++){
+             //get a random number
              myRandom = ThreadLocalRandom.current().nextInt(0,10);
+             //add it to the array
              RandNumbers[i]=myRandom;
              }
         
         // We will store the threads so that we can check if they are done
         List<Thread> threads = new ArrayList<Thread>();
+        //set each thread to 20K
         for(int i=1;i<200000;i++){
             //process the sum for a range of 1000 random numbers
+            //pass the array length, array, and the start/end of which index in the array to sum
             Runnable task = new ThisThread(arrayLength,RandNumbers,(1000*i)-1000,1000*i);
             Thread worker = new Thread(task);
             worker.setName(String.valueOf(i));
             worker.start();            
             threads.add(worker);
-            System.out.println(worker.getStackTrace());
+            
+            
         }
         //set the array length of 200M
         arrayLength=200000000;
@@ -43,7 +53,9 @@ public class Main{
         myRandom = 0;
         //Create the random array
          for (int i=0;i<RandNumbersAll.length;i++){
+             //get a random number
              myRandom = ThreadLocalRandom.current().nextInt(0,10);
+             //add it to the array
              RandNumbersAll[i]=myRandom;
              }
         //pass the array length, array, and the start/end of which index in the array to sum
@@ -52,7 +64,7 @@ public class Main{
         workerAll.setName(String.valueOf(5));
         workerAll.start();
         threads.add(workerAll);
-        
+       
         
         int running = 0;
         do {
@@ -74,12 +86,14 @@ class ThisThread implements Runnable{
     private int RandNumbers[];
     private int startN;
     private int endN;
+    static int mySum;
     
     ThisThread(int arrayLength, int myArray[], int startN, int endN){
         this.arrayLength=arrayLength;
         this.RandNumbers=myArray;
         this.startN=startN;
         this.endN=endN;
+        
     }
     
     @Override
@@ -88,7 +102,7 @@ class ThisThread implements Runnable{
         int arrayLength=this.arrayLength;
         int myRandom = 0;
               
-        int mySum=0;
+        this.mySum=0;
         try { 
             long startTime = System.nanoTime();
             //go through the array for the given start and end numbers
@@ -109,7 +123,9 @@ class ThisThread implements Runnable{
         
         
     }  
-  
+    public int call() {
+        return IntStream.of(this.mySum).sum();
+    }
    public void start() {
         System.out.println("Thread started");
         if (myThread == null) {
